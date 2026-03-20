@@ -161,6 +161,84 @@ body {
   color: #0f3050;
 }
 
+.insight-text {
+  margin: 8px 0 0;
+  padding: 8px;
+  border-radius: 9px;
+  border: 1px solid rgba(26, 74, 114, 0.18);
+  background: linear-gradient(135deg, rgba(218, 242, 255, 0.42), rgba(237, 248, 255, 0.66));
+  font-size: 0.79rem;
+  line-height: 1.4;
+  color: #214767;
+}
+
+.legend-card {
+  border: 1px solid rgba(18, 40, 65, 0.14);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.75);
+  padding: 9px;
+}
+
+.legend-ramp {
+  margin-top: 8px;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.legend-ramp span {
+  font-size: 0.74rem;
+  color: #315170;
+  font-weight: 700;
+}
+
+.legend-gradient {
+  height: 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(11, 34, 58, 0.24);
+  background: linear-gradient(90deg, #d6654f, #f0c45e, #1a9f8c);
+}
+
+.legend-list {
+  margin-top: 9px;
+  display: grid;
+  gap: 6px;
+  color: #355473;
+}
+
+.legend-list div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot,
+.legend-poly,
+.legend-selected {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.legend-dot {
+  background: #1a9f8c;
+  border: 1px solid #ffffff;
+}
+
+.legend-poly {
+  border-radius: 3px;
+  background: rgba(26, 159, 140, 0.38);
+  border: 1px solid #435e79;
+}
+
+.legend-selected {
+  background: #ffffff;
+  border: 2px solid #173a5b;
+}
+
 .accordion {
   border-radius: 9px;
   border: 1px solid rgba(18, 40, 65, 0.14);
@@ -192,9 +270,9 @@ a {
   flex-direction: column;
   gap: 5px;
   margin-bottom: 10px;
-  font-size: 0.74rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
+  text-transform: none;
   color: #55708a;
 }
 

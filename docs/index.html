@@ -26,28 +26,57 @@
     <aside class="insights-panel panel">
       <section>
         <h2 id="selectedSchoolTitle">Select a school</h2>
-        <p id="selectedSchoolMeta" class="muted">Click a school point to inspect value metrics.</p>
+        <p id="selectedSchoolMeta" class="muted">Click a school point to inspect local school signals.</p>
+        <p id="selectedSchoolInsight" class="insight-text">Pick a school on the map to see plain-language explanations.</p>
         <div id="selectedSchoolMetrics" class="metric-grid"></div>
+      </section>
+
+      <section>
+        <h3>Map legend</h3>
+        <div class="legend-card">
+          <p id="metricLegendLine" class="muted small">Colours show lower to higher values for the selected map metric.</p>
+          <div class="legend-ramp">
+            <span id="legendLowLabel">Lower</span>
+            <div class="legend-gradient" aria-hidden="true"></div>
+            <span id="legendHighLabel">Higher</span>
+          </div>
+          <div class="legend-list small">
+            <div><i class="legend-dot" aria-hidden="true"></i> Coloured dots = schools (bigger dot = more enrolments)</div>
+            <div><i class="legend-poly" aria-hidden="true"></i> Shaded polygons = official school catchments (where published)</div>
+            <div><i class="legend-selected" aria-hidden="true"></i> White ring = selected school</div>
+          </div>
+        </div>
       </section>
 
       <section>
         <h3>How this works</h3>
         <details class="accordion" open>
-          <summary>Scoring model</summary>
-          <p class="muted small">
-            Value score combines school quality (ICSEA), affordability context (SA2 housing burden),
-            and teaching-capacity proxy (inverse student-teacher ratio).
-          </p>
+          <summary>Start here (for parents)</summary>
+          <ol class="muted small">
+            <li>Choose your state, then type a suburb or school name in search.</li>
+            <li>Switch map metric to compare school quality, affordability context, or overall suitability score.</li>
+            <li>Click any school dot to see plain-language metrics and what they mean.</li>
+            <li>Use the charts to compare shortlisted schools against others in your filtered view.</li>
+          </ol>
         </details>
 
         <details class="accordion">
-          <summary>How to use</summary>
-          <ol class="muted small">
-            <li>Select a state to focus school points and catchments.</li>
-            <li>Filter by school sector/type and search by school name.</li>
-            <li>Switch map metric to view quality, affordability, or value.</li>
-            <li>Use charts to verify trade-offs before shortlisting suburbs.</li>
-          </ol>
+          <summary>Metric meanings in plain English</summary>
+          <ul class="muted small">
+            <li><strong>Overall suitability score</strong>: blended indicator combining quality context, affordability context, and staffing pressure.</li>
+            <li><strong>School quality context (ICSEA)</strong>: social-educational profile index; higher values often indicate stronger learning context.</li>
+            <li><strong>Affordability percentile</strong>: higher values indicate more budget-friendly housing context around the school.</li>
+            <li><strong>Class size pressure</strong>: students per teacher; lower values can indicate more teacher capacity per student.</li>
+            <li><strong>SA2</strong>: ABS Statistical Area Level 2, a standard neighbourhood-sized region for local statistics.</li>
+          </ul>
+        </details>
+
+        <details class="accordion">
+          <summary>Scoring model</summary>
+          <p class="muted small">
+            The overall suitability score combines school quality context (ICSEA), housing affordability context (SA2 housing burden),
+            and teaching-capacity proxy (inverse student-teacher ratio). It is designed for comparison, not as a single final decision.
+          </p>
         </details>
 
         <details class="accordion">
@@ -84,8 +113,8 @@
       <label>
         Map metric
         <select id="metricSelect">
-          <option value="value_score">Value score</option>
-          <option value="icsea">ICSEA</option>
+          <option value="value_score">Overall suitability score</option>
+          <option value="icsea">School quality context (ICSEA)</option>
           <option value="affordability_percentile">Affordability percentile</option>
         </select>
       </label>
@@ -106,11 +135,11 @@
 
     <section class="charts-shell panel">
       <div class="chart-card">
-        <h3>Top Schools In Current View</h3>
+        <h3>Highest suitability schools in view</h3>
         <div id="topSchoolsChart" class="chart"></div>
       </div>
       <div class="chart-card">
-        <h3>Quality vs Housing Burden</h3>
+        <h3>School quality vs housing pressure</h3>
         <div id="tradeoffChart" class="chart"></div>
       </div>
     </section>
