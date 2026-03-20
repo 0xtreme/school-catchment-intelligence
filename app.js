@@ -1,4 +1,24 @@
 const CATCHMENT_STATES = new Set(['NSW', 'VIC', 'QLD']);
+const METRICS = {
+  value_score: {
+    label: 'Overall suitability score',
+    type: 'number',
+    digits: 1,
+    plainMeaning: 'Higher values indicate stronger combined suitability signals in this view.',
+  },
+  icsea: {
+    label: 'School quality context (ICSEA)',
+    type: 'number',
+    digits: 0,
+    plainMeaning: 'Higher values indicate higher social-educational advantage in the ICSEA index.',
+  },
+  affordability_percentile: {
+    label: 'Affordability percentile',
+    type: 'percent',
+    digits: 1,
+    plainMeaning: 'Higher values indicate more affordable local housing context relative to other areas.',
+  },
+};
 
 const state = {
   dataset: null,
@@ -28,10 +48,14 @@ const el = {
   coverageLine: document.getElementById('coverageLine'),
   selectedSchoolTitle: document.getElementById('selectedSchoolTitle'),
   selectedSchoolMeta: document.getElementById('selectedSchoolMeta'),
+  selectedSchoolInsight: document.getElementById('selectedSchoolInsight'),
   selectedSchoolMetrics: document.getElementById('selectedSchoolMetrics'),
   topSchoolsChart: document.getElementById('topSchoolsChart'),
   tradeoffChart: document.getElementById('tradeoffChart'),
   hoverTip: document.getElementById('hoverTip'),
+  metricLegendLine: document.getElementById('metricLegendLine'),
+  legendLowLabel: document.getElementById('legendLowLabel'),
+  legendHighLabel: document.getElementById('legendHighLabel'),
 };
 
 function setCatchmentStatus(message, pct = null) {
@@ -63,6 +87,19 @@ function pct(value, digits = 1) {
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
   })}%`;
+}
+
+function formatMetricValue(metricKey, value) {
+  const metric = METRICS[metricKey] ?? { type: 'number', digits: 1 };
+  if (!Number.isFinite(value)) {
+    return 'N/A';
+  }
+
+  if (metric.type === 'percent') {
+    return pct(value, metric.digits);
+  }
+
+  return num(value, metric.digits);
 }
 
 function fetchJson(url) {
@@ -121,6 +158,24 @@ function metricExpression(metric) {
       stops.mid, '#f0c45e',
       stops.high, '#1a9f8c'],
   ];
+}
+
+function renderLegend() {
+  const metricMeta = METRICS[state.selectedMetric] ?? { label: state.selectedMetric, plainMeaning: '' };
+  const stops = computeMetricStops(state.selectedMetric);
+
+  if (el.metricLegendLine) {
+    el.metricLegendLine.textContent =
+      `${metricMeta.label}: red = lower values, green = higher values in the current filtered view. ${metricMeta.plainMeaning}`;
+  }
+
+  if (el.legendLowLabel) {
+    el.legendLowLabel.textContent = `Lower ${formatMetricValue(state.selectedMetric, stops.low)}`;
+  }
+
+  if (el.legendHighLabel) {
+    el.legendHighLabel.textContent = `Higher ${formatMetricValue(state.selectedMetric, stops.high)}`;
+  }
 }
 
 function updateMapStyleByMetric() {
@@ -232,7 +287,10 @@ function renderSelectedSchool() {
       el.selectedSchoolTitle.textContent = 'Select a school';
     }
     if (el.selectedSchoolMeta) {
-      el.selectedSchoolMeta.textContent = 'Click a school point to inspect value metrics.';
+      el.selectedSchoolMeta.textContent = 'Click a school point to inspect local school signals.';
+    }
+    if (el.selectedSchoolInsight) {
+      el.selectedSchoolInsight.textContent = 'Pick a school on the map to see what the numbers mean in plain English.';
     }
     if (el.selectedSchoolMetrics) {
       el.selectedSchoolMetrics.innerHTML = '';
@@ -243,14 +301,35 @@ function renderSelectedSchool() {
   el.selectedSchoolTitle.textContent = school.school_name;
   el.selectedSchoolMeta.textContent = `${school.school_sector} | ${school.school_type} | ${school.suburb}, ${school.state}`;
 
+  const qualityBand = Number(school.icsea) >= 1050
+    ? 'higher than average'
+    : Number(school.icsea) <= 950
+      ? 'below average'
+      : 'around the middle range';
+  const affordabilityBand = Number(school.affordability_percentile) >= 70
+    ? 'more budget-friendly'
+    : Number(school.affordability_percentile) <= 30
+      ? 'more expensive'
+      : 'mid-range for affordability';
+  const classPressureBand = Number(school.student_teacher_ratio) <= 13
+    ? 'lower class-size pressure'
+    : Number(school.student_teacher_ratio) >= 16
+      ? 'higher class-size pressure'
+      : 'moderate class-size pressure';
+
+  if (el.selectedSchoolInsight) {
+    el.selectedSchoolInsight.textContent =
+      `Plain summary: this school is in a ${affordabilityBand} area, has ${qualityBand} learning context, and shows ${classPressureBand}.`;
+  }
+
   const cards = [
-    { label: 'Value score', value: num(school.value_score, 1) },
-    { label: 'ICSEA', value: num(school.icsea, 0) },
+    { label: 'Overall suitability score', value: num(school.value_score, 1) },
+    { label: 'School quality context (ICSEA)', value: num(school.icsea, 0) },
     { label: 'Affordability percentile', value: pct(school.affordability_percentile, 1) },
-    { label: 'Student-teacher ratio', value: num(school.student_teacher_ratio, 2) },
-    { label: 'Median weekly rent (SA2)', value: school.median_weekly_rent ? `$${num(school.median_weekly_rent, 0)}` : 'N/A' },
+    { label: 'Class size pressure (students/teacher)', value: num(school.student_teacher_ratio, 2) },
+    { label: 'Typical weekly rent nearby (SA2)', value: school.median_weekly_rent ? `$${num(school.median_weekly_rent, 0)}` : 'N/A' },
     {
-      label: 'Population growth 1Y (SA2)',
+      label: 'Local population growth 1Y (SA2)',
       value: Number.isFinite(school.population_growth_1y_pct)
         ? `${num(school.population_growth_1y_pct, 1)}%`
         : 'N/A',
@@ -281,13 +360,13 @@ function renderCharts() {
         y: topRows.map((row) => `${row.school_name} (${row.state})`),
         x: topRows.map((row) => row.value_score),
         marker: { color: '#0f9f9a' },
-        hovertemplate: '%{y}<br>Value score: %{x:.1f}<extra></extra>',
+        hovertemplate: '%{y}<br>Overall suitability score: %{x:.1f}<extra></extra>',
       },
     ],
     {
       margin: { t: 6, l: 220, r: 14, b: 34 },
       yaxis: { autorange: 'reversed', color: '#406180' },
-      xaxis: { title: 'Value score', color: '#406180' },
+      xaxis: { title: 'Overall suitability score', color: '#406180' },
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
       font: { color: '#294968', size: 11 },
@@ -308,7 +387,7 @@ function renderCharts() {
         x: scatterRows.map((row) => row.housing_burden * 100),
         y: scatterRows.map((row) => row.icsea),
         text: scatterRows.map(
-          (row) => `${row.school_name}<br>${row.suburb}, ${row.state}<br>Value ${num(row.value_score, 1)}`,
+          (row) => `${row.school_name}<br>${row.suburb}, ${row.state}<br>Suitability ${num(row.value_score, 1)}`,
         ),
         marker: {
           size: scatterRows.map((row) => Math.max(6, Math.min(22, Math.sqrt(row.total_enrolments || 0) / 6))),
@@ -322,8 +401,8 @@ function renderCharts() {
     ],
     {
       margin: { t: 6, l: 52, r: 14, b: 38 },
-      xaxis: { title: 'SA2 housing burden (%)', color: '#406180' },
-      yaxis: { title: 'ICSEA', color: '#406180' },
+      xaxis: { title: 'Local housing burden (%)', color: '#406180' },
+      yaxis: { title: 'School quality context (ICSEA)', color: '#406180' },
       paper_bgcolor: 'rgba(0,0,0,0)',
       plot_bgcolor: 'rgba(0,0,0,0)',
       font: { color: '#294968', size: 11 },
@@ -359,6 +438,7 @@ function getFilteredSchools() {
 function applyFiltersAndRender() {
   state.filteredSchools = getFilteredSchools();
   updateSchoolSource();
+  renderLegend();
   renderCharts();
 
   if (!state.filteredSchools.some((school) => school.acara_sml_id === state.selectedSchoolId)) {
@@ -408,6 +488,8 @@ function initControls() {
   el.metricSelect.addEventListener('change', (event) => {
     state.selectedMetric = event.target.value;
     updateMapStyleByMetric();
+    renderLegend();
+    renderSelectedSchool();
   });
 
   el.searchInput.addEventListener('input', (event) => {
@@ -524,8 +606,8 @@ function initMap() {
         el.hoverTip.innerHTML = `
           <div class="title">${feature.properties.school_name}</div>
           <div class="line">${feature.properties.suburb}, ${feature.properties.state}</div>
-          <div class="line">Value score: <strong>${num(Number(feature.properties.value_score), 1)}</strong></div>
-          <div class="line">ICSEA: <strong>${num(Number(feature.properties.icsea), 0)}</strong></div>
+          <div class="line">Overall suitability: <strong>${num(Number(feature.properties.value_score), 1)}</strong></div>
+          <div class="line">School quality context (ICSEA): <strong>${num(Number(feature.properties.icsea), 0)}</strong></div>
         `;
         el.hoverTip.style.left = `${event.point.x}px`;
         el.hoverTip.style.top = `${event.point.y}px`;
