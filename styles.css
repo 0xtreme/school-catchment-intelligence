@@ -32,6 +32,27 @@ body {
   inset: 0;
 }
 
+.map-legend-overlay {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(var(--edge-gap) + var(--bottom-height) + 10px);
+  width: 440px;
+  max-width: calc(100vw - 700px);
+  min-width: 300px;
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 19;
+}
+
+.map-legend-overlay h3 {
+  margin: 0;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #355575;
+}
+
 .panel {
   backdrop-filter: blur(10px);
   background: var(--panel);
@@ -384,11 +405,19 @@ li + li {
   .filters-panel {
     width: 265px;
   }
+
+  .map-legend-overlay {
+    max-width: calc(100vw - 640px);
+  }
 }
 
 @media (max-width: 980px) {
   body {
     overflow: auto;
+  }
+
+  .map-legend-overlay {
+    display: none;
   }
 
   .top-shell,

@@ -56,6 +56,9 @@ const el = {
   metricLegendLine: document.getElementById('metricLegendLine'),
   legendLowLabel: document.getElementById('legendLowLabel'),
   legendHighLabel: document.getElementById('legendHighLabel'),
+  overlayMetricLegend: document.getElementById('overlayMetricLegend'),
+  overlayLegendLow: document.getElementById('overlayLegendLow'),
+  overlayLegendHigh: document.getElementById('overlayLegendHigh'),
 };
 
 function setCatchmentStatus(message, pct = null) {
@@ -163,18 +166,33 @@ function metricExpression(metric) {
 function renderLegend() {
   const metricMeta = METRICS[state.selectedMetric] ?? { label: state.selectedMetric, plainMeaning: '' };
   const stops = computeMetricStops(state.selectedMetric);
+  const leadText = `${metricMeta.label}: red = lower values, green = higher values in the current filtered view. ${metricMeta.plainMeaning}`;
+  const lowText = `Lower ${formatMetricValue(state.selectedMetric, stops.low)}`;
+  const highText = `Higher ${formatMetricValue(state.selectedMetric, stops.high)}`;
 
   if (el.metricLegendLine) {
-    el.metricLegendLine.textContent =
-      `${metricMeta.label}: red = lower values, green = higher values in the current filtered view. ${metricMeta.plainMeaning}`;
+    el.metricLegendLine.textContent = leadText;
   }
 
   if (el.legendLowLabel) {
-    el.legendLowLabel.textContent = `Lower ${formatMetricValue(state.selectedMetric, stops.low)}`;
+    el.legendLowLabel.textContent = lowText;
   }
 
   if (el.legendHighLabel) {
-    el.legendHighLabel.textContent = `Higher ${formatMetricValue(state.selectedMetric, stops.high)}`;
+    el.legendHighLabel.textContent = highText;
+  }
+
+  if (el.overlayMetricLegend) {
+    el.overlayMetricLegend.textContent =
+      `${metricMeta.label}: circles and polygons both use this colour scale (red lower -> green higher).`;
+  }
+
+  if (el.overlayLegendLow) {
+    el.overlayLegendLow.textContent = lowText;
+  }
+
+  if (el.overlayLegendHigh) {
+    el.overlayLegendHigh.textContent = highText;
   }
 }
 
