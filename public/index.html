@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Australia School Catchment Intelligence</title>
+    <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" />
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+
+    <header class="top-shell panel">
+      <div>
+        <h1>Australia School Catchment Intelligence</h1>
+        <p>Compare school quality, affordability context, and official catchment coverage in one map.</p>
+      </div>
+      <div class="loading-chip">
+        <div id="catchmentStatus" class="status-line">Initializing data...</div>
+        <div class="status-bar"><div id="catchmentProgress" class="status-fill"></div></div>
+      </div>
+    </header>
+
+    <aside class="insights-panel panel">
+      <section>
+        <h2 id="selectedSchoolTitle">Select a school</h2>
+        <p id="selectedSchoolMeta" class="muted">Click a school point to inspect value metrics.</p>
+        <div id="selectedSchoolMetrics" class="metric-grid"></div>
+      </section>
+
+      <section>
+        <h3>How this works</h3>
+        <details class="accordion" open>
+          <summary>Scoring model</summary>
+          <p class="muted small">
+            Value score combines school quality (ICSEA), affordability context (SA2 housing burden),
+            and teaching-capacity proxy (inverse student-teacher ratio).
+          </p>
+        </details>
+
+        <details class="accordion">
+          <summary>How to use</summary>
+          <ol class="muted small">
+            <li>Select a state to focus school points and catchments.</li>
+            <li>Filter by school sector/type and search by school name.</li>
+            <li>Switch map metric to view quality, affordability, or value.</li>
+            <li>Use charts to verify trade-offs before shortlisting suburbs.</li>
+          </ol>
+        </details>
+
+        <details class="accordion">
+          <summary>Official sources used</summary>
+          <ul class="muted small">
+            <li>ACARA My School Data Access: School Profile 2025 and School Location 2025</li>
+            <li>ABS Data API: Census 2021 G02 (SA2 medians) and Annual ERP ASGS 2021</li>
+            <li>NSW Department of Education catchments (Data NSW)</li>
+            <li>Victorian Government School Zones 2026 (DataVic)</li>
+            <li>Queensland school catchments 2025 (data.qld.gov.au)</li>
+          </ul>
+        </details>
+      </section>
+    </aside>
+
+    <aside class="filters-panel panel">
+      <h3>Filters</h3>
+
+      <label>
+        State or territory
+        <select id="stateSelect"></select>
+      </label>
+
+      <label>
+        School sector
+        <select id="sectorSelect"></select>
+      </label>
+
+      <label>
+        School type
+        <select id="typeSelect"></select>
+      </label>
+
+      <label>
+        Map metric
+        <select id="metricSelect">
+          <option value="value_score">Value score</option>
+          <option value="icsea">ICSEA</option>
+          <option value="affordability_percentile">Affordability percentile</option>
+        </select>
+      </label>
+
+      <label>
+        Search school
+        <input id="searchInput" type="text" placeholder="Type school name" />
+      </label>
+
+      <label class="checkbox-row">
+        <input id="showCatchments" type="checkbox" checked />
+        Show official catchment polygons
+      </label>
+
+      <p id="metaLine" class="small muted"></p>
+      <p id="coverageLine" class="small muted"></p>
+    </aside>
+
+    <section class="charts-shell panel">
+      <div class="chart-card">
+        <h3>Top Schools In Current View</h3>
+        <div id="topSchoolsChart" class="chart"></div>
+      </div>
+      <div class="chart-card">
+        <h3>Quality vs Housing Burden</h3>
+        <div id="tradeoffChart" class="chart"></div>
+      </div>
+    </section>
+
+    <div id="hoverTip" class="hover-tip hidden"></div>
+
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,23 @@
+{
+  "name": "school-catchment-intelligence",
+  "version": "1.0.0",
+  "description": "Australia-wide school catchment intelligence using official public datasets",
+  "main": "public/app.js",
+  "scripts": {
+    "fetch:data": "node scripts/fetch-data.mjs",
+    "build:data": "node scripts/build-dataset.mjs",
+    "sync:pages": "node scripts/sync-pages-assets.mjs",
+    "build": "npm run fetch:data && npm run build:data && npm run sync:pages",
+    "serve": "python3 -m http.server 4173"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@tmcw/togeojson": "^6.0.0",
+    "@xmldom/xmldom": "^0.9.8",
+    "shapefile": "^0.6.6",
+    "xlsx": "^0.18.5"
+  }
+}
