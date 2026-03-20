@@ -12,6 +12,22 @@
   </head>
   <body>
     <div id="map"></div>
+    <div class="map-legend-overlay panel">
+      <h3>Map legend</h3>
+      <p id="overlayMetricLegend" class="small muted">
+        Circle dots and catchment polygons use the same colour scale for the selected metric.
+      </p>
+      <div class="legend-ramp">
+        <span id="overlayLegendLow">Lower</span>
+        <div class="legend-gradient" aria-hidden="true"></div>
+        <span id="overlayLegendHigh">Higher</span>
+      </div>
+      <div class="legend-list small">
+        <div><i class="legend-dot" aria-hidden="true"></i> Dot colour: lower (red) to higher (green) metric values</div>
+        <div><i class="legend-poly" aria-hidden="true"></i> Polygon shade: same lower-to-higher scale as dots</div>
+        <div><i class="legend-selected" aria-hidden="true"></i> White ring: selected school</div>
+      </div>
+    </div>
 
     <header class="top-shell panel">
       <div>
