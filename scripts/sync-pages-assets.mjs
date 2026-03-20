@@ -10,6 +10,7 @@ const filePairs = [
   ['public/index.html', 'docs/index.html'],
   ['public/app.js', 'docs/app.js'],
   ['public/styles.css', 'docs/styles.css'],
+  ['public/favicon.svg', 'docs/favicon.svg'],
 ];
 
 async function copyFilePair(srcRelative, dstRelative) {
