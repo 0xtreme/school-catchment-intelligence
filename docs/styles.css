@@ -10,6 +10,8 @@
   --accent-2: #f39a3b;
   --edge-gap: 14px;
   --bottom-height: 262px;
+  --insights-width: 360px;
+  --filters-width: 295px;
 }
 
 * {
@@ -34,12 +36,11 @@ body {
 
 .map-legend-overlay {
   position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
+  left: calc(var(--edge-gap) + var(--insights-width) + 12px);
+  right: calc(var(--edge-gap) + var(--filters-width) + 12px);
   bottom: calc(var(--edge-gap) + var(--bottom-height) + 10px);
-  width: 440px;
-  max-width: calc(100vw - 700px);
-  min-width: 300px;
+  width: auto;
+  min-width: 260px;
   border-radius: 12px;
   padding: 10px;
   z-index: 19;
@@ -128,12 +129,12 @@ body {
 
 .insights-panel {
   left: var(--edge-gap);
-  width: 360px;
+  width: var(--insights-width);
 }
 
 .filters-panel {
   right: var(--edge-gap);
-  width: 295px;
+  width: var(--filters-width);
 }
 
 .insights-panel section + section {
@@ -396,18 +397,8 @@ li + li {
 @media (max-width: 1200px) {
   :root {
     --bottom-height: 250px;
-  }
-
-  .insights-panel {
-    width: 320px;
-  }
-
-  .filters-panel {
-    width: 265px;
-  }
-
-  .map-legend-overlay {
-    max-width: calc(100vw - 640px);
+    --insights-width: 320px;
+    --filters-width: 265px;
   }
 }
 
